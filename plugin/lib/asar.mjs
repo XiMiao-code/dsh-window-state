@@ -10,7 +10,32 @@
  *   - 数据区起点：16 + headerSize
  */
 
-import {
+import * as nodeFs from "node:fs";
+import { createRequire } from "node:module";
+import { createHash } from "node:crypto";
+import { join, dirname, basename } from "node:path";
+
+/**
+ * 选一个能读 app.asar 的 fs。
+ * Electron 会给 node:fs 挂 asar 层：路径里出现 *.asar 时会被当成 asar 内部路径解析，
+ * 对 app.asar 本身 open/read 会报 "ENOENT, not found in ..."。original-fs 没有这层，
+ * 能直接操作 asar 文件字节。纯 Node 进程（没有 original-fs）回落 node:fs。
+ */
+function pickFs() {
+  try {
+    const req = createRequire(import.meta.url);
+    const ofs = req("original-fs");
+    if (ofs && typeof ofs.openSync === "function" && typeof ofs.readSync === "function") {
+      return ofs;
+    }
+  } catch {
+    /* original-fs 不可用（非 Electron 环境） */
+  }
+  return nodeFs;
+}
+
+const fs = pickFs();
+const {
   readFileSync,
   writeFileSync,
   openSync,
@@ -21,9 +46,7 @@ import {
   existsSync,
   statSync,
   readdirSync,
-} from "node:fs";
-import { createHash } from "node:crypto";
-import { join, dirname, basename } from "node:path";
+} = fs;
 
 // ---------------------------------------------------------------------------
 // 补丁片段（与 bin/patch.mjs 保持一致）
