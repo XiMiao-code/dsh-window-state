@@ -1,0 +1,26 @@
+{
+  "name": "dsh-window-state-patch",
+  "version": "1.0.0",
+  "description": "让 DeepSeek Harness 桌面窗口记住关闭前的位置和大小（Make the DSH desktop window remember its previous position and size）",
+  "type": "module",
+  "bin": {
+    "dsh-window-state-patch": "bin/patch.mjs"
+  },
+  "files": [
+    "bin",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "deepseek",
+    "dsh",
+    "deepseek-harness",
+    "window-state",
+    "electron",
+    "patch"
+  ]
+}
